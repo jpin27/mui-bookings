@@ -7,7 +7,7 @@ export default function Home() {
   return (
     <div className={styles.container}>
       <Head>
-        <title>Create Next App</title>
+        <title>Jude Pineda - MUI Booking Table</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
@@ -15,13 +15,7 @@ export default function Home() {
         <h1 className={styles.title}>
           MaterialUI Booking Table
         </h1>
-
-        <p className={styles.description}>
-          Get started by editing <code>pages/index.js</code>
-        </p>
-
         <BookingTable />
-
       </main>
 
       <footer>

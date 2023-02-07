@@ -1,12 +1,31 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+
+import Bookings from './Bookings';
+import CreateBooking from "./CreateBooking";
+
 import {
+  Box,
+  Button,
+  IconButton,
+  Modal,
+  Paper,
   TableBody,
   Table,
   TableCell,
   TableContainer,
   TableHead,
-  TableRow
+  TableRow,
+  Toolbar,
+  Tooltip,
+  Typography
 } from "@mui/material";
+import { tableCellClasses } from "@mui/material/TableCell";
+import { styled } from "@mui/material/styles";
+
+import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
+
+
 import { firestore } from '../firebase/initializeFirebase';
 import { 
   collection, 
@@ -20,65 +39,98 @@ import {
   updateDoc, 
   where 
 } from "@firebase/firestore";
-import { useState, useEffect } from 'react';
-import Paper from "@mui/material/Paper";
+
+
+// style params for the create modal
+const style = {
+  position: 'absolute' as 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: 400,
+  bgcolor: 'background.paper',
+  border: '2px solid #000',
+  boxShadow: 24,
+  p: 4,
+};
+
+function EnhancedTableToolbar() {
+  return (
+    <Toolbar sx={{ pl: { sm: 2 }, pr: { xs: 1, sm: 1 } }}>
+      <Typography
+        sx={{ flex: '1 1 100%' }}
+        variant="h6"
+        id="tableTitle"
+        component="div"
+      >
+        Bookings
+      </Typography>     
+      <CreateBooking />      
+    </Toolbar>
+  );
+}
+
+const header = ['ID', 'Seeker', 'Giver', 'Date', 'Total Amount', 'Actions',]
+const StyledTableCell = styled(TableCell)(({ theme }) => ({
+    [`&.${tableCellClasses.head}`]: {
+        backgroundColor: theme.palette.primary.main,
+        color: theme.palette.common.white,
+    },
+    [`&.${tableCellClasses.body}`]: {
+        fontSize: 14,
+    },
+}));
 
 export default function BookingTable() {
+  const bookings = Bookings();
 
-  const [bookings, setBookings] = useState( [] );
-  const [loading, setLoading] = useState<boolean>( true );
+  
 
-  useEffect( () => {
-    getBookings();
-    setTimeout( () => {
-      setLoading(false);
-    }, 2000)
-  },[]);
 
-  const bookingsCollection = collection(firestore, 'bookings');
 
-  const getBookings = async () => {
-    const bookingsQuery = query(
-      bookingsCollection,  
-      limit(10)
-    );
-
-    const queryResult = await getDocs(bookingsQuery);
-    const result = queryResult.docs.map((booking) => {
-      return { ...booking.data(), document_id: booking.id }
-    });
-   
-    setBookings(result);
-  };
 
   return (
-    <TableContainer component={Paper}>
-      <Table aria-label="simple table">
-        <TableHead>
-          <TableRow>
-            <TableCell>ID</TableCell>
-            <TableCell align="right">Seeker</TableCell>
-            <TableCell align="right">Giver</TableCell>
-            <TableCell align="right">Date</TableCell>
-            <TableCell align="right">Total&nbsp;Amount</TableCell>
-            <TableCell align="right">Actions</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {bookings.map((booking) => (
-            <TableRow key={booking.booking_id}>
-              <TableCell component="th" scope="row">
-                {booking.booking_id}
-              </TableCell>
-              <TableCell align="right">{booking.seeker}</TableCell>
-              <TableCell align="right">{booking.giver}</TableCell>
-              <TableCell align="right">dateu</TableCell>
-              <TableCell align="right">{booking.amount}</TableCell>
-              <TableCell align="right">Actions</TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
+    <Box sx={{ width: '100%' }}>
+      <Paper sx={{ width: '100%', mb: 2 }}>
+        <EnhancedTableToolbar/>
+        <TableContainer>
+          <Table aria-label="simple table">
+            <TableHead>
+              <TableRow>
+                <StyledTableCell>{header[0]}</StyledTableCell>
+                <StyledTableCell>{header[1]}</StyledTableCell>
+                <StyledTableCell>{header[2]}</StyledTableCell>
+                <StyledTableCell>{header[3]}</StyledTableCell>
+                <StyledTableCell>{header[4]}</StyledTableCell>
+                <StyledTableCell>{header[5]}</StyledTableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {bookings.map((booking) => (
+                <TableRow key={booking.booking_id}>
+                  <TableCell component="th" scope="row">
+                    {booking.booking_id}
+                  </TableCell>
+                  <TableCell align="right">{booking.seeker}</TableCell>
+                  <TableCell align="right">{booking.giver}</TableCell>
+                  <TableCell align="right">
+                    {booking.date.toDate().toDateString()}
+                  </TableCell>
+                  <TableCell align="right">{booking.amount}</TableCell>
+                  <TableCell align="center">
+                    <IconButton>
+                      <EditIcon/>
+                    </IconButton>
+                    <IconButton >
+                      <DeleteIcon/>
+                    </IconButton>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </Paper>
+    </Box>
   );
 }
