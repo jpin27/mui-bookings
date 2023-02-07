@@ -6,8 +6,10 @@ import {
     DialogContent,
     DialogContentText,
     DialogTitle,
+    IconButton,
     TextField
 } from '@mui/material';
+import EditIcon from "@mui/icons-material/Edit";
 import Bookings from './Bookings';
 import { firestore } from '../firebase/initializeFirebase';
 import {
@@ -24,11 +26,10 @@ import {
   where 
 } from "@firebase/firestore";
 
-import AddIcon from "@mui/icons-material/Add";
 
 const dbInstance = collection(firestore, 'bookings');
 
-export default function CreateBooking() {
+export default function UpdateBooking(props) {
     
   const bookings = Bookings();
   const [open, setOpen] = React.useState(false);
@@ -46,7 +47,6 @@ export default function CreateBooking() {
 
   const handleClose = () => {
     setOpen(false);
-    window.top.location.reload();
   };
 
   const handleSubmit = () => {
@@ -54,49 +54,46 @@ export default function CreateBooking() {
     console.log(giver);
     console.log(date);
     console.log(amount);
-    addBooking();
+    updateBooking();
     handleClose();
   }
 
-  const addBooking = async () => {
+  const updateBooking = async () => {
 
-    // structure the booking data
-    const bookingData = {
-      booking_id: booking_id,  
-      seeker: seeker,
-      giver: giver,
-      date:  new Date(date),
-      amount: parseFloat(amount)
-    };
-    try {
-      // insert record in collection
-      await addDoc(dbInstance, bookingData);
-      // show a success message
-      console.log("Booking added successfully");
-        //reset fields
-    //  setSeeker("");
-    //  setGiver("");
-    } catch (error) {
-      // show an error message
-      console.log("An error occurred while adding the booking");
-    }
+    console.log("You booped the button");
+    // // structure the booking data
+    // const bookingData = {
+    //   booking_id: booking_id,  
+    //   seeker: seeker,
+    //   giver: giver,
+    //   date:  new Date(date),
+    //   amount: parseFloat(amount)
+    // };
+    // try {
+    //   // insert record in collection
+    //   await addDoc(dbInstance, bookingData);
+    //   // show a success message
+    //   console.log("Booking added successfully");
+    //     //reset fields
+    // //  setSeeker("");
+    // //  setGiver("");
+    // } catch (error) {
+    //   // show an error message
+    //   console.log("An error occurred while adding the booking");
+    // }
   };
 
   return (
     <div>
-      <Button 
-        size = "small" 
-        startIcon = {<AddIcon />}
-        onClick={handleClickOpen}
-      >
-        Create
-      </Button>
+      <IconButton onClick={handleClickOpen}>
+        <EditIcon/>
+      </IconButton>
 
       <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>Create a Booking</DialogTitle>
+        <DialogTitle>Update a Booking</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            To create a booking, please enter the information needed below.
+            Please update the fields below with the new information.
           </DialogContentText>
           <TextField
             autoFocus
@@ -149,7 +146,7 @@ export default function CreateBooking() {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>Cancel</Button>
-          <Button onClick={handleSubmit}>Create</Button>
+          <Button onClick={handleSubmit}>Update</Button>
         </DialogActions>
       </Dialog>
     </div>

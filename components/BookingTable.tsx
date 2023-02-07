@@ -25,7 +25,6 @@ import { styled } from "@mui/material/styles";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 
-
 import { firestore } from '../firebase/initializeFirebase';
 import { 
   collection, 
@@ -39,7 +38,9 @@ import {
   updateDoc, 
   where 
 } from "@firebase/firestore";
+import UpdateBooking from "./UpdateBooking";
 
+const dbInstance = collection(firestore, 'bookings');
 
 // style params for the create modal
 const style = {
@@ -81,13 +82,9 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
     },
 }));
 
+
 export default function BookingTable() {
   const bookings = Bookings();
-
-  
-
-
-
 
   return (
     <Box sx={{ width: '100%' }}>
@@ -118,9 +115,7 @@ export default function BookingTable() {
                   </TableCell>
                   <TableCell align="right">{booking.amount}</TableCell>
                   <TableCell align="center">
-                    <IconButton>
-                      <EditIcon/>
-                    </IconButton>
+                    <UpdateBooking document_id={booking.document_id} />
                     <IconButton >
                       <DeleteIcon/>
                     </IconButton>
