@@ -1,36 +1,28 @@
 import React, { useState } from 'react';
 import {
-    Button,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogContentText,
-    DialogTitle,
-    TextField
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  TextField
 } from '@mui/material';
-import Bookings from './Bookings';
 import { firestore } from '../firebase/initializeFirebase';
 import {
   addDoc, 
-  collection, 
-  deleteDoc, 
-  doc, 
-  DocumentData, 
-  getDocs, 
-  limit, 
-  query, 
-  QueryDocumentSnapshot, 
-  updateDoc, 
-  where 
+  collection
 } from "@firebase/firestore";
 
 import AddIcon from "@mui/icons-material/Add";
 
 const dbInstance = collection(firestore, 'bookings');
 
-export default function CreateBooking() {
+export default function CreateBooking({
+  bookingsCollection,
+  refreshBookings
+}) {
     
-  const bookings = Bookings();
   const [open, setOpen] = React.useState(false);
 
   const [seeker, setSeeker] = useState('');
@@ -38,48 +30,48 @@ export default function CreateBooking() {
   const [date, setDate] = useState('');
   const [amount, setAmount] = useState('');
 
-  const booking_id = bookings.length + 1;
-
   const handleClickOpen = () => {
     setOpen(true);
   };
 
   const handleClose = () => {
     setOpen(false);
-    window.top.location.reload();
   };
 
   const handleSubmit = () => {
-    console.log(seeker);
-    console.log(giver);
-    console.log(date);
-    console.log(amount);
     addBooking();
+    refreshBookings();
     handleClose();
   }
+
+  /* Generate an ID for the new booking entry.
+   * Take all existing IDs, sort them in descending order,
+   * and increment the largest value by 1.
+   */
+  const bookingIdArray = bookingsCollection
+                          .map(({ booking_id }) => booking_id)
+                          .sort((a, b) => b - a);
+  const newBookingId = bookingIdArray[0] + 1;
 
   const addBooking = async () => {
 
     // structure the booking data
     const bookingData = {
-      booking_id: booking_id,  
+      booking_id: newBookingId,  
       seeker: seeker,
       giver: giver,
       date:  new Date(date),
       amount: parseFloat(amount)
     };
+
     try {
       // insert record in collection
       await addDoc(dbInstance, bookingData);
-      // show a success message
       console.log("Booking added successfully");
-        //reset fields
-    //  setSeeker("");
-    //  setGiver("");
     } catch (error) {
-      // show an error message
       console.log("An error occurred while adding the booking");
     }
+    
   };
 
   return (

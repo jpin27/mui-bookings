@@ -10,7 +10,6 @@ import {
     TextField
 } from '@mui/material';
 import EditIcon from "@mui/icons-material/Edit";
-import Bookings from './Bookings';
 import { firestore } from '../firebase/initializeFirebase';
 import {
   addDoc, 
@@ -31,7 +30,6 @@ const dbInstance = collection(firestore, 'bookings');
 
 export default function UpdateBooking(props) {
     
-  const bookings = Bookings();
   const [open, setOpen] = React.useState(false);
 
   const [seeker, setSeeker] = useState('');
@@ -39,7 +37,6 @@ export default function UpdateBooking(props) {
   const [date, setDate] = useState('');
   const [amount, setAmount] = useState('');
 
-  const booking_id = bookings.length + 1;
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -60,7 +57,7 @@ export default function UpdateBooking(props) {
 
   const updateBooking = async () => {
 
-    console.log("You booped the button");
+    console.log("You clicked the button");
     // // structure the booking data
     // const bookingData = {
     //   booking_id: booking_id,  

@@ -1,13 +1,9 @@
 import React, { useState, useEffect } from "react";
-
-import Bookings from './Bookings';
+import Booking from './Booking';
 import CreateBooking from "./CreateBooking";
 
 import {
   Box,
-  Button,
-  IconButton,
-  Modal,
   Paper,
   TableBody,
   Table,
@@ -22,23 +18,9 @@ import {
 import { tableCellClasses } from "@mui/material/TableCell";
 import { styled } from "@mui/material/styles";
 
-import DeleteIcon from "@mui/icons-material/Delete";
-import EditIcon from "@mui/icons-material/Edit";
-
 import { firestore } from '../firebase/initializeFirebase';
-import { 
-  collection, 
-  deleteDoc, 
-  doc, 
-  DocumentData, 
-  getDocs, 
-  limit, 
-  query, 
-  QueryDocumentSnapshot, 
-  updateDoc, 
-  where 
-} from "@firebase/firestore";
-import UpdateBooking from "./UpdateBooking";
+import { collection, getDocs, query } from "@firebase/firestore";
+
 
 const dbInstance = collection(firestore, 'bookings');
 
@@ -55,7 +37,7 @@ const style = {
   p: 4,
 };
 
-function EnhancedTableToolbar() {
+function EnhancedTableToolbar({bookings, refreshBookings}) {
   return (
     <Toolbar sx={{ pl: { sm: 2 }, pr: { xs: 1, sm: 1 } }}>
       <Typography
@@ -66,7 +48,10 @@ function EnhancedTableToolbar() {
       >
         Bookings
       </Typography>     
-      <CreateBooking />      
+      <CreateBooking
+        bookingsCollection = { bookings } 
+        refreshBookings    = { refreshBookings }
+      />      
     </Toolbar>
   );
 }
@@ -82,14 +67,35 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
     },
 }));
 
-
 export default function BookingTable() {
-  const bookings = Bookings();
+  // const bookings = Bookings();
+
+  const [bookings, setBookings] = useState( [] );
+
+  useEffect( () => {
+    getBookings();
+    setTimeout( () => { }, 1000);
+  },[]);
+
+  const bookingsCollection = collection(firestore, 'bookings');
+
+  const getBookings = async () => {
+    const bookingsQuery = query( bookingsCollection );
+    const queryResult = await getDocs(bookingsQuery);
+    const result = queryResult.docs.map((booking) => {
+      return { ...booking.data(), document_id: booking.id }
+    });
+   
+    setBookings(result);
+  };
 
   return (
     <Box sx={{ width: '100%' }}>
       <Paper sx={{ width: '100%', mb: 2 }}>
-        <EnhancedTableToolbar/>
+        <EnhancedTableToolbar
+          bookings        = { bookings }
+          refreshBookings = { getBookings }
+        />
         <TableContainer>
           <Table aria-label="simple table">
             <TableHead>
@@ -104,23 +110,17 @@ export default function BookingTable() {
             </TableHead>
             <TableBody>
               {bookings.map((booking) => (
-                <TableRow key={booking.booking_id}>
-                  <TableCell component="th" scope="row">
-                    {booking.booking_id}
-                  </TableCell>
-                  <TableCell align="right">{booking.seeker}</TableCell>
-                  <TableCell align="right">{booking.giver}</TableCell>
-                  <TableCell align="right">
-                    {booking.date.toDate().toDateString()}
-                  </TableCell>
-                  <TableCell align="right">{booking.amount}</TableCell>
-                  <TableCell align="center">
-                    <UpdateBooking document_id={booking.document_id} />
-                    <IconButton >
-                      <DeleteIcon/>
-                    </IconButton>
-                  </TableCell>
-                </TableRow>
+                <Booking
+                  allBookings   = { bookings }
+                  booking_id    = { booking.booking_id }
+                  document_id   = { booking.document_id }
+                  seeker        = { booking.seeker }
+                  giver         = { booking.giver }
+                  date          = { booking.date.toDate().toDateString() }
+                  amount        = { booking.amount}
+                  deleteBooking = { setBookings }
+                  getBookings   = { getBookings }
+                />                
               ))}
             </TableBody>
           </Table>
