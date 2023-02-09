@@ -12,7 +12,6 @@ import {
   TableHead,
   TableRow,
   Toolbar,
-  Tooltip,
   Typography
 } from "@mui/material";
 import { tableCellClasses } from "@mui/material/TableCell";
@@ -68,7 +67,6 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
 }));
 
 export default function BookingTable() {
-  // const bookings = Bookings();
 
   const [bookings, setBookings] = useState( [] );
 

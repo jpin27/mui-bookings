@@ -44,19 +44,35 @@ export default function UpdateBooking({
   // create a pointer to the Document id
   const docRef = doc(firestore,`bookings/${document_id}`);
   const booking = bookings.find(obj => obj.document_id === document_id);
+  const formattedDate = (dateString) => {
 
-  const [seeker, setSeeker] = useState('');
-  const [giver, setGiver] = useState('');
-  const [date, setDate] = useState('');
-  const [amount, setAmount] = useState('');
+    var d = new Date(dateString.toDate().toDateString()),
+        month = '' + (d.getMonth() + 1),
+        day = '' + d.getDate(),
+        year = d.getFullYear();
+
+    if (month.length < 2) 
+        month = '0' + month;
+    if (day.length < 2) 
+        day = '0' + day;
+
+    return [year, month, day].join('-');
+
+  }
+
+  const [seeker, setSeeker] = useState(booking.seeker);
+  const [giver, setGiver] = useState(booking.giver);
+  const [date, setDate] = useState(formattedDate(booking.date));
+  const [amount, setAmount] = useState(booking.amount);
 
   const updateBooking = async () => {
     // structure the booking data
     const bookingData = {  
-      seeker: seeker,
-      giver: giver,
-      date:  new Date(date),
-      amount: parseFloat(amount)
+      seeker:   seeker,
+      giver:    giver,
+      // assign noon instead of midnight to avoid timezone conflicts
+      date:     new Date(date + "T12:00:00"),
+      amount:   parseFloat(amount)
     };
     try {
       // insert record in collection
@@ -64,7 +80,7 @@ export default function UpdateBooking({
       // show a success message
     } catch (error) {
       // show an error message
-      console.log("An error occurred while adding the booking");
+      console.log("An error occurred while updating the booking");
     }
   };
 
@@ -110,7 +126,7 @@ export default function UpdateBooking({
             id="date"
             label="Date"
             type="date"
-            defaultValue={booking.date.toDate()}
+            defaultValue={formattedDate(booking.date)}
             variant="filled"
             fullWidth
             InputLabelProps={{

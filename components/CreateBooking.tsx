@@ -54,20 +54,18 @@ export default function CreateBooking({
   const newBookingId = bookingIdArray[0] + 1;
 
   const addBooking = async () => {
-
     // structure the booking data
     const bookingData = {
       booking_id: newBookingId,  
       seeker: seeker,
       giver: giver,
-      date:  new Date(date),
+      // assign noon instead of midnight to avoid timezone conflicts
+      date:  new Date(date + "T12:00:00"),
       amount: parseFloat(amount)
     };
 
     try {
-      // insert record in collection
       await addDoc(dbInstance, bookingData);
-      console.log("Booking added successfully");
     } catch (error) {
       console.log("An error occurred while adding the booking");
     }
