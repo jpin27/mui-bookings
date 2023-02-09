@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
     Button,
     Dialog,
@@ -40,20 +40,11 @@ export default function DeleteBooking({
 
   const deleteBooking = async (documentId: string) => {
     try {
-
       // create a pointer to the Document id
       const docRef = doc(firestore,`bookings/${documentId}`);
       // delete the doc
       await deleteDoc(docRef);
-
-      // show a success message
-      console.log("Bookinginging deleted successfully");
-      
-      //reset fields
-      //  setSeeker("");
-      //  setGiver("");
     } catch (error) {
-      // show an error message
       console.log("An error occurred while deleting the booking");
     }
   };

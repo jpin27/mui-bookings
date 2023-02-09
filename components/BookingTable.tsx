@@ -56,7 +56,7 @@ function EnhancedTableToolbar({bookings, refreshBookings}) {
   );
 }
 
-const header = ['ID', 'Seeker', 'Giver', 'Date', 'Total Amount', 'Actions',]
+const headers = ['ID', 'Seeker', 'Giver', 'Date', 'Total Amount', 'Actions',]
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
     [`&.${tableCellClasses.head}`]: {
         backgroundColor: theme.palette.primary.main,
@@ -100,25 +100,23 @@ export default function BookingTable() {
           <Table aria-label="simple table">
             <TableHead>
               <TableRow>
-                <StyledTableCell>{header[0]}</StyledTableCell>
-                <StyledTableCell>{header[1]}</StyledTableCell>
-                <StyledTableCell>{header[2]}</StyledTableCell>
-                <StyledTableCell>{header[3]}</StyledTableCell>
-                <StyledTableCell>{header[4]}</StyledTableCell>
-                <StyledTableCell>{header[5]}</StyledTableCell>
+                {headers.map(header => (
+                  <StyledTableCell>
+                    { header }
+                  </StyledTableCell>             
+                ))}
               </TableRow>
             </TableHead>
             <TableBody>
               {bookings.map((booking) => (
                 <Booking
-                  allBookings   = { bookings }
+                  bookings      = { bookings }
                   booking_id    = { booking.booking_id }
                   document_id   = { booking.document_id }
                   seeker        = { booking.seeker }
                   giver         = { booking.giver }
                   date          = { booking.date.toDate().toDateString() }
                   amount        = { booking.amount}
-                  deleteBooking = { setBookings }
                   getBookings   = { getBookings }
                 />                
               ))}

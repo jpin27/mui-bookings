@@ -12,31 +12,20 @@ import {
 import EditIcon from "@mui/icons-material/Edit";
 import { firestore } from '../firebase/initializeFirebase';
 import {
-  addDoc, 
   collection, 
-  deleteDoc, 
   doc, 
-  DocumentData, 
-  getDocs, 
-  limit, 
-  query, 
-  QueryDocumentSnapshot, 
-  updateDoc, 
-  where 
+  updateDoc
 } from "@firebase/firestore";
-
 
 const dbInstance = collection(firestore, 'bookings');
 
-export default function UpdateBooking(props) {
+export default function UpdateBooking({
+  bookings,
+  document_id, 
+  refreshBookings
+}) {
     
-  const [open, setOpen] = React.useState(false);
-
-  const [seeker, setSeeker] = useState('');
-  const [giver, setGiver] = useState('');
-  const [date, setDate] = useState('');
-  const [amount, setAmount] = useState('');
-
+  const [open, setOpen] = useState(false);
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -47,37 +36,36 @@ export default function UpdateBooking(props) {
   };
 
   const handleSubmit = () => {
-    console.log(seeker);
-    console.log(giver);
-    console.log(date);
-    console.log(amount);
     updateBooking();
+    refreshBookings();
     handleClose();
-  }
+  } 
+  
+  // create a pointer to the Document id
+  const docRef = doc(firestore,`bookings/${document_id}`);
+  const booking = bookings.find(obj => obj.document_id === document_id);
+
+  const [seeker, setSeeker] = useState('');
+  const [giver, setGiver] = useState('');
+  const [date, setDate] = useState('');
+  const [amount, setAmount] = useState('');
 
   const updateBooking = async () => {
-
-    console.log("You clicked the button");
-    // // structure the booking data
-    // const bookingData = {
-    //   booking_id: booking_id,  
-    //   seeker: seeker,
-    //   giver: giver,
-    //   date:  new Date(date),
-    //   amount: parseFloat(amount)
-    // };
-    // try {
-    //   // insert record in collection
-    //   await addDoc(dbInstance, bookingData);
-    //   // show a success message
-    //   console.log("Booking added successfully");
-    //     //reset fields
-    // //  setSeeker("");
-    // //  setGiver("");
-    // } catch (error) {
-    //   // show an error message
-    //   console.log("An error occurred while adding the booking");
-    // }
+    // structure the booking data
+    const bookingData = {  
+      seeker: seeker,
+      giver: giver,
+      date:  new Date(date),
+      amount: parseFloat(amount)
+    };
+    try {
+      // insert record in collection
+      await updateDoc(docRef, bookingData);
+      // show a success message
+    } catch (error) {
+      // show an error message
+      console.log("An error occurred while adding the booking");
+    }
   };
 
   return (
@@ -98,9 +86,10 @@ export default function UpdateBooking(props) {
             id="seeker"
             label="Seeker's Name"
             type="text"
+            defaultValue={booking.seeker}
             fullWidth
             variant="filled"
-            onChange = {e => {
+            onChange={e => {
               setSeeker(e.target.value)
             }}
           />
@@ -109,9 +98,10 @@ export default function UpdateBooking(props) {
             id="giver"
             label="Giver's Name"
             type="text"
+            defaultValue={booking.giver}
             fullWidth
             variant="filled"
-            onChange = {e => {
+            onChange={e => {
               setGiver(e.target.value)
             }}
           />
@@ -120,12 +110,13 @@ export default function UpdateBooking(props) {
             id="date"
             label="Date"
             type="date"
+            defaultValue={booking.date.toDate()}
             variant="filled"
             fullWidth
             InputLabelProps={{
               shrink: true,
             }}
-            onChange = {e => {
+            onChange={e => {
               setDate(e.target.value)
             }}
           />
@@ -134,9 +125,10 @@ export default function UpdateBooking(props) {
             id="amount"
             label="Total Amount"
             type="text"
+            defaultValue={booking.amount}
             fullWidth
             variant="filled"
-            onChange = {e => {
+            onChange={e => {
               setAmount(e.target.value)
             }}
           />

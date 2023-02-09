@@ -71,7 +71,7 @@ export default function CreateBooking({
     } catch (error) {
       console.log("An error occurred while adding the booking");
     }
-    
+
   };
 
   return (
